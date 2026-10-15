@@ -14,18 +14,22 @@ import '../../../../core/constants/api_endpoints.dart';
     final List jsonData=response.data;
     final List<categoriesModels> dartData=jsonData.map((e)=>categoriesModels.fromJson(e)).toList();
     return dartData;
-    throw UnimplementedError();
+
   }
 
   @override
-  Future<List<productsModels>> getProducts(int? categoryId) async {
+  Future<List<productsModels>>  getProducts(int? categoryId, {required int limit,required int offset}) async {
     final response= await apiClient.dio.get
-      ("${ApiEndpoints.categoriesEndpoints}/${ApiEndpoints.productsEndpoints}");
+      ("${ApiEndpoints.categoriesEndpoints}/$categoryId/${ApiEndpoints.productsEndpoints}",
+    queryParameters: {
+        "limit":limit,
+        "offset":offset
+        },
+    );
     final List jsonData=response.data;
     final List<productsModels> products=jsonData.map((e)=>productsModels.fromJson(e)).toList();
     return products;
 
-    throw UnimplementedError();
   }
 
 }

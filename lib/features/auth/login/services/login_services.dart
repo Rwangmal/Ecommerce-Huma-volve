@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:ecommerce_app_huma_volve/core/storage/secure_storage.dart';
+
 import '../../../../core/network/api_client.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../features/auth/login/models/loginModels.dart';
@@ -14,6 +16,8 @@ final response = await apiClient.dio.post(ApiEndpoints.loginEndpoints,data:
 );
 final Map<String,dynamic> jsonData= response.data;
 final modelData=loginModels.fromJson(jsonData);
+await secureStorage.saveAccessToken(modelData.accessToken);
+await secureStorage.saveRefreshToken(modelData.refreshToken);
 return modelData;
   }
 
