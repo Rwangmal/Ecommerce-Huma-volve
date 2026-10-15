@@ -1,12 +1,14 @@
-import 'package:ecommerce_app_huma_volve/features/home/cubit/home_cubit.dart';
-import 'package:ecommerce_app_huma_volve/features/home/cubit/home_states.dart';
-import 'package:ecommerce_app_huma_volve/features/home/screens/widgets/category_chip.dart';
-import 'package:ecommerce_app_huma_volve/features/home/screens/widgets/product_card.dart';
+import 'package:ecommerce_app_huma_volve/features/home/presentation/view/widgets/category_chip.dart';
+import 'package:ecommerce_app_huma_volve/features/home/presentation/view/widgets/product_card.dart';
+import 'package:ecommerce_app_huma_volve/features/home/presentation/viewModel/home_cubit.dart';
+import 'package:ecommerce_app_huma_volve/features/home/presentation/viewModel/home_states.dart';
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/dummy_data.dart';
-import '../../../core/theme.dart';
+import 'lib/core/dummy_data.dart';
+import 'lib/core/theme.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -19,6 +21,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategoryIndex = 0;
 
+  @override
+  void initState() {
+  context.read<HomeCubit>().LoadHomeDate();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,6 +121,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 32),
 
           BlocBuilder<HomeCubit,HomeStates>(
+            buildWhen: (previous, current) {
+              if(current is ProductsError || current is ProductsIsLoading || current is ProductsSuccess)
+                {return false ;}
+              return true;
+            }
+            ,
               builder:
                   (BuildContext context ,state){
                 if(state is CategoriesIsLoading){
@@ -122,18 +135,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 else if (state is CategoriesError){
                   return Text(state.errorMessage);
                 }
-                else if (state is CategoriesSuccess)
-                // {final Categories=state.Categories;
+                else if (state is CategoriesSuccess){
+               final Categories=state.CategoriesModels;
                   return  SizedBox(
                   height: 44,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    itemCount: dummyCategories.length,
+                    itemCount: Categories.length,
                     separatorBuilder: (context, index) =>
                     const SizedBox(width: 12),
                     itemBuilder: (context, index) {
                       return CategoryChip(
-                        label: dummyCategories[index],
+                        label: Categories[index].name??"all",
                         isSelected: _selectedCategoryIndex == index,
                         onTap: () {
                           setState(() {
@@ -143,7 +156,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
-                );}
+                );
+                }else {
+                  return SizedBox.shrink();
+                }
                 },
 
                 ),
