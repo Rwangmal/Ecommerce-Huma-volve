@@ -1,4 +1,7 @@
 import 'package:ecommerce_app_huma_volve/core/network/api_client.dart';
+import 'package:ecommerce_app_huma_volve/features/home/data/dataSource/homeRemoteDataSource.dart';
+import 'package:ecommerce_app_huma_volve/features/home/data/dataSource/homeRemoteDataSourceImp.dart';
+import 'package:ecommerce_app_huma_volve/features/home/data/repository/homeRepositoryImp.dart';
 import 'package:ecommerce_app_huma_volve/features/home/domain/repository/homeRepository.dart';
 import 'package:ecommerce_app_huma_volve/features/home/domain/useCase/get_Producats_useCase.dart';
 import 'package:ecommerce_app_huma_volve/features/home/domain/useCase/get_categories_useCase.dart';
@@ -9,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme.dart';
 
 import '../../cart/screens/cart_screen.dart';
+import '../../home/presentation/view/home_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -19,17 +23,23 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
+
   int _currentIndex = 0;
-  late final Homerepository homerepository;
-late final getCategoriesUseCase GetProductsUseCase;
-late final getProductsUseCase GetCategoriesUseCase;
+  late final ApiClient apiClient;
+  late final homeRemoteDataSource HomeRemoteDataSource;
+  late final Homerepository homeRepository;
+  late final getCategoriesUseCase GetCategoriesUseCase;
+  late final getProductsUseCase GetProductsUseCase;
 late final HomeCubit homeCubit;
 @override
   void initState() {
-  homerepository=Homerepository();
-GetProductsUseCase=getProductsUseCase();
-GetCategoriesUseCase=getCategoriesUseCase();
-    homeCubit=HomeCubit(GetProductsUseCase: getProductsUseCase(), GetCategoriesUseCase: getCategoriesUseCase());
+  apiClient=ApiClient();
+  HomeRemoteDataSource=homeRemoteDataSourceImpl(apiClient);
+  homeRepository=homeRepositoryImp(HomeRemoteDataSource);
+GetCategoriesUseCase=getCategoriesUseCase(homeRepository);
+GetProductsUseCase=getProductsUseCase(homeRepository);
+    homeCubit=HomeCubit(GetProductsUseCase: GetProductsUseCase, GetCategoriesUseCase:GetCategoriesUseCase
+ );
     super.initState();
   }
 
